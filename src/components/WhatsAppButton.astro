@@ -1,0 +1,34 @@
+---
+import { whatsappUrl } from '../data/site';
+import { withBase } from '../lib/urls';
+interface Props { label?: string; class?: string }
+const { label = 'Agendar pelo WhatsApp', class: className = '' } = Astro.props;
+const topics: Record<string, string> = {
+  '/especialidades/cardiologia/': 'uma consulta de Cardiologia',
+  '/especialidades/clinica-medica/': 'uma consulta de Clínica Médica',
+  '/especialidades/ginecologia/': 'uma consulta de Ginecologia',
+  '/especialidades/ortopedia/': 'uma consulta de Ortopedia',
+  '/especialidades/pediatria/': 'uma consulta de Pediatria',
+  '/especialidades/dermatologia/': 'uma consulta de Dermatologia',
+  '/especialidades/nutricao/': 'uma consulta de Nutrição',
+  '/especialidades/cirurgia-plastica/': 'uma avaliação de Cirurgia Plástica',
+  '/exames/ecografia/': 'um exame de Ecografia',
+  '/exames/laboratorio/': 'um exame laboratorial',
+  '/exames/raio-x/': 'um exame de Raio-X',
+  '/exames/admissional-demissional/': 'um exame Admissional ou Demissional',
+  '/convenios/': 'atendimento via reembolso do meu convênio',
+  '/contato/': 'uma consulta ou exame'
+};
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const currentPath = Astro.url.pathname.startsWith(base)
+  ? Astro.url.pathname.slice(base.length) || '/'
+  : Astro.url.pathname;
+const topic = topics[currentPath];
+const contextualUrl = topic
+  ? `https://api.whatsapp.com/send?phone=5561991117464&text=${encodeURIComponent(`Estou no site da Clínica Ceilândia e quero informações sobre ${topic}.`)}`
+  : whatsappUrl;
+---
+<a class:list={['button button-whatsapp', className]} href={contextualUrl} target="_blank" rel="noopener noreferrer">
+  <img src={withBase('/assets/whatsapp.svg')} alt="" width="20" height="20" />
+  {label}
+</a>

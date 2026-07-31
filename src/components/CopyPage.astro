@@ -1,0 +1,232 @@
+---
+import type { CopySection } from '../lib/copy';
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import ContactForm from './ContactForm.astro';
+import MapEmbed from './MapEmbed.astro';
+import { withBase } from '../lib/urls';
+interface Props { sections: CopySection[]; pageTitle: string; path: string }
+const { sections, pageTitle, path } = Astro.props;
+const hero = sections[0];
+const rest = sections.slice(1);
+const isFaq = path === '/perguntas-frequentes/';
+const isContact = path === '/contato/';
+const isHub = path === '/especialidades/' || path === '/exames/';
+const isConvenios = path === '/convenios/';
+const isLegal = path === '/politica-de-privacidade/' || path === '/termos-de-uso/';
+const cleanCta = (cta: string) => cta.replace(/^\[|\]$/g, '');
+const sectionKicker = (label: string) => {
+  const cleanLabel = label.replace(/Seção \d+ — /, '').replace(/\s*\([^)]*\)\s*$/, '');
+  if (/^CTA( final)?$/i.test(cleanLabel)) return 'Próximo passo';
+  if (/Texto explicativo/i.test(cleanLabel)) return 'Entenda como funciona';
+  if (/Lista de convênios/i.test(cleanLabel)) return 'Consulte abaixo';
+  if (/Tópicos a incluir/i.test(cleanLabel)) return 'Transparência e segurança';
+  if (/Selos de confiança/i.test(cleanLabel)) return 'Segurança e confiança';
+  if (/Grid de/i.test(cleanLabel)) return 'Opções disponíveis';
+  if (/Bloco de confiança/i.test(cleanLabel)) return 'Experiência e credibilidade';
+  if (/Selo de legalidade/i.test(cleanLabel)) return 'Segurança no atendimento';
+  if (/Formulário de pré-agendamento/i.test(cleanLabel)) return 'Pré-agendamento';
+  return cleanLabel;
+};
+const internalCta = (cta: string) => {
+  if (/estrutura/i.test(cta)) return '/estrutura/';
+  if (/formulário/i.test(cta)) return '/contato/';
+  if (/Localização|rota/i.test(cta)) return 'https://www.google.com/maps?cid=183631488420269462';
+  return null;
+};
+const groupEcografia = (section: CopySection) => {
+  const groups = [
+    ['Abdome e vias urinárias', /Abdome|Parede abdominal|Região inguinal|Rins/i],
+    ['Saúde da mulher e obstetrícia', /Mamas|Obstétrico|Transvaginal/i],
+    ['Saúde do homem', /Pélvico masculino|Testículo/i],
+    ['Articulações', /Articulação/i],
+    ['Tireoide e região cervical', /Tireoide/i]
+  ] as const;
+  return groups.map(([title, pattern]) => ({
+    title,
+    items: section.items.filter((item) => pattern.test(item.text))
+  })).filter((group) => group.items.length);
+};
+const getConvenios = (section: CopySection) =>
+  (section.paragraphs[0] || '')
+    .replace(/\s+e outros\.$/, '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean);
+const groupConvenios = (section: CopySection) => {
+  const groups = new Map<string, string[]>();
+  for (const name of getConvenios(section)) {
+    const letter = name.charAt(0).toLocaleUpperCase('pt-BR');
+    groups.set(letter, [...(groups.get(letter) || []), name]);
+  }
+  return [...groups.entries()];
+};
+const heroImages: Record<string, [string, string]> = {
+  '/quem-somos/': ['/assets/hero-quem-somos.png', 'Imagem ilustrativa de consulta médica humanizada'],
+  '/estrutura/': ['/assets/hero-estrutura.png', 'Imagem ilustrativa de recepção de clínica'],
+  '/especialidades/': ['/assets/hero-especialidades.png', 'Imagem ilustrativa de especialistas médicos'],
+  '/especialidades/cardiologia/': ['/assets/hero-cardiologia.png', 'Imagem ilustrativa de atendimento em cardiologia'],
+  '/especialidades/clinica-medica/': ['/assets/hero-quem-somos.png', 'Imagem ilustrativa de consulta de Clínica Médica'],
+  '/especialidades/ginecologia/': ['/assets/hero-familia.png', 'Imagem ilustrativa de atendimento à saúde da mulher'],
+  '/especialidades/ortopedia/': ['/assets/hero-ortopedia.png', 'Imagem ilustrativa de atendimento em ortopedia'],
+  '/especialidades/pediatria/': ['/assets/hero-familia.png', 'Imagem ilustrativa de atendimento pediátrico'],
+  '/especialidades/dermatologia/': ['/assets/hero-bem-estar.png', 'Imagem ilustrativa de consulta de dermatologia'],
+  '/especialidades/nutricao/': ['/assets/hero-bem-estar.png', 'Imagem ilustrativa de acompanhamento nutricional'],
+  '/especialidades/cirurgia-plastica/': ['/assets/hero-especialidades.png', 'Imagem ilustrativa de avaliação médica especializada'],
+  '/exames/': ['/assets/hero-exames.png', 'Imagem ilustrativa de preparação de equipamento diagnóstico'],
+  '/exames/ecografia/': ['/assets/hero-ecografia-lab.png', 'Imagem ilustrativa de exame de ecografia'],
+  '/exames/laboratorio/': ['/assets/hero-ecografia-lab.png', 'Imagem ilustrativa de exames laboratoriais'],
+  '/exames/raio-x/': ['/assets/hero-exames.png', 'Imagem ilustrativa de equipamento de raio-X'],
+  '/exames/admissional-demissional/': ['/assets/hero-ocupacional-convenios.png', 'Imagem ilustrativa de atendimento de saúde ocupacional'],
+  '/convenios/': ['/assets/hero-ocupacional-convenios.png', 'Imagem ilustrativa de orientação sobre convênios'],
+  '/perguntas-frequentes/': ['/assets/hero-faq.png', 'Imagem ilustrativa de atendimento para esclarecimento de dúvidas'],
+  '/contato/': ['/assets/hero-contato.png', 'Imagem ilustrativa de atendimento ao paciente'],
+  '/politica-de-privacidade/': ['/assets/hero-legal.png', 'Imagem ilustrativa de proteção e segurança de dados'],
+  '/termos-de-uso/': ['/assets/hero-legal.png', 'Imagem ilustrativa de documentos institucionais protegidos']
+};
+const [heroImagePath, heroAlt] = heroImages[path] ?? heroImages['/quem-somos/'];
+const heroImage = withBase(heroImagePath);
+---
+<section class="page-hero">
+  <div class="hero-orb hero-orb-one"></div>
+  <div class="hero-orb hero-orb-two"></div>
+  <div class="container page-hero-inner">
+    <div>
+      <div class="eyebrow">Clínica Ceilândia</div>
+      <h1>{hero?.title || pageTitle}</h1>
+      {hero?.lead && <p>{hero.lead}</p>}
+      {hero?.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      {!isLegal && (
+        <div class="button-row">
+          {hero?.ctas.length ? hero.ctas.map((cta) => <WhatsAppButton label={cleanCta(cta)} />) : <WhatsAppButton />}
+        </div>
+      )}
+    </div>
+    <div class="page-hero-visual">
+      <img src={heroImage} alt={heroAlt} />
+      <span class="image-disclaimer">Imagem ilustrativa</span>
+      <div class="floating-note"><Icon name="check" /> Atendimento com hora marcada</div>
+    </div>
+  </div>
+</section>
+
+{rest.map((section, index) => (
+  <section class:list={['content-section', index % 2 === 1 && 'section-tinted']}>
+    <div class="container narrow">
+      <div class="section-heading">
+        <span class="section-kicker">{sectionKicker(section.label)}</span>
+        {section.title && <h2>{section.title}</h2>}
+        {section.lead && <p>{section.lead}</p>}
+      </div>
+      {section.paragraphs.map((paragraph, paragraphIndex) =>
+        !(isConvenios && /Convênios com os quais|Planos com Possibilidade/.test(section.title || '') && paragraphIndex === 0)
+          && <p class="body-copy">{paragraph}</p>
+      )}
+
+      {isConvenios && /Convênios com os quais|Planos com Possibilidade/.test(section.title || '') && (
+        <div class="convenio-directory">
+          <div class="convenio-search">
+            <label for="buscar-convenio">Encontre seu convênio</label>
+            <input id="buscar-convenio" type="search" placeholder="Digite o nome do convênio" autocomplete="off" />
+          </div>
+          <p class="convenio-count" aria-live="polite">{getConvenios(section).length} convênios disponíveis</p>
+          <div class="convenio-groups">
+            {groupConvenios(section).map(([letter, names]) => (
+              <section class="convenio-group" data-convenio-group>
+                <h3>{letter}</h3>
+                <div>
+                  {names.map((name) => <span class="convenio-chip" data-convenio={name}>{name}</span>)}
+                </div>
+              </section>
+            ))}
+          </div>
+          <p class="convenio-empty" hidden>Nenhum convênio encontrado. Fale conosco para confirmar outras opções.</p>
+        </div>
+      )}
+
+      {path === '/exames/ecografia/' && /Modalidades Realizadas/.test(section.title || '') ? (
+        <div class="exam-category-grid">
+          {groupEcografia(section).map((group) => (
+            <article class="exam-category">
+              <div class="icon-badge"><Icon name="medical" /></div>
+              <h3>{group.title}</h3>
+              <ul>{group.items.map((item) => <li>{item.text}</li>)}</ul>
+            </article>
+          ))}
+        </div>
+      ) : isFaq && section.items.length > 0 ? (
+        <div class="faq-list">
+          {section.items.map((item) => (
+            <details>
+              <summary>{item.title || item.text}</summary>
+              {item.title && <p>{item.text}</p>}
+            </details>
+          ))}
+        </div>
+      ) : section.items.length > 0 && !(isContact && /Pré-Agendamento/.test(section.title || '')) ? (
+        <div class:list={['content-grid', isHub && 'hub-grid']}>
+          {section.items.map((item) => (
+            <article class="info-card">
+              <div class="icon-badge"><Icon name={isHub ? (path === '/exames/' ? 'medical' : undefined) : 'check'} /></div>
+              {item.title && <h3>{item.title}</h3>}
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+      ) : null}
+
+      {isContact && /Pré-Agendamento/.test(section.title || '') && <ContactForm />}
+      {isContact && /Localização/.test(section.title || '') && <MapEmbed class="content-map" />}
+      {section.notes.length > 0 && <div class="note-row">{section.notes.map((note) => <span class="badge">{note}</span>)}</div>}
+      {section.ctas.length > 0 && !(isContact && /Pré-Agendamento/.test(section.title || '')) && (
+        <div class="button-row section-actions">
+          {section.ctas.map((cta) => {
+            const href = internalCta(cta);
+            return href
+              ? <a class="button button-outline" href={href.startsWith('/') ? withBase(href) : href}>{cleanCta(cta)}</a>
+              : <WhatsAppButton label={cleanCta(cta)} />;
+          })}
+        </div>
+      )}
+    </div>
+  </section>
+))}
+
+{!isLegal && (
+  <section class="compact-cta">
+    <div class="container compact-cta-inner">
+      <div>
+        <span class="eyebrow light">Atendimento sem burocracia</span>
+        <h2>Agende sua consulta ou exame hoje</h2>
+      </div>
+      <WhatsAppButton />
+    </div>
+  </section>
+)}
+
+{isConvenios && (
+  <script>
+    const search = document.querySelector<HTMLInputElement>('#buscar-convenio');
+    const chips = Array.from(document.querySelectorAll<HTMLElement>('[data-convenio]'));
+    const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-convenio-group]'));
+    const count = document.querySelector<HTMLElement>('.convenio-count');
+    const empty = document.querySelector<HTMLElement>('.convenio-empty');
+    const normalize = (value: string) =>
+      value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
+
+    search?.addEventListener('input', () => {
+      const term = normalize(search.value.trim());
+      let visible = 0;
+      chips.forEach((chip) => {
+        const match = normalize(chip.dataset.convenio || '').includes(term);
+        chip.hidden = !match;
+        if (match) visible++;
+      });
+      groups.forEach((group) => {
+        group.hidden = !group.querySelector('[data-convenio]:not([hidden])');
+      });
+      if (count) count.textContent = `${visible} ${visible === 1 ? 'convênio disponível' : 'convênios disponíveis'}`;
+      if (empty) empty.hidden = visible !== 0;
+    });
+  </script>
+)}

@@ -1,0 +1,214 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import ContactForm from '../components/ContactForm.astro';
+import MapEmbed from '../components/MapEmbed.astro';
+import { exams, specialties } from '../data/site';
+import { withBase } from '../lib/urls';
+const differences = [
+  ['Preço acessível', 'consultas e exames com valores populares, sem necessidade de plano de saúde', 'heart'],
+  ['Localização estratégica', 'em frente à Fundação Bradesco, fácil acesso na Ceilândia', 'pin'],
+  ['Corpo clínico experiente', 'médicos atuantes nos principais hospitais do DF', 'medical'],
+  ['Estrutura completa', 'consultório, laboratório parceiro e equipamentos próprios', 'shield'],
+  ['Agendamento rápido', 'marque por WhatsApp ou formulário, sem burocracia', 'clock']
+] as const;
+
+const reviews = [
+  {
+    name: 'Maria Rita Dantas',
+    rating: 5,
+    text: 'Medicamentos na hora, disponibidade de exames, boa estrutura',
+    image: withBase('/assets/avaliacao-maria-rita.png')
+  },
+  {
+    name: 'Jule K Santos',
+    rating: 5,
+    text: 'Pediatra adorável, profissional e foi direta no diagnóstico. Atendimento no geral muito bom!!',
+    image: withBase('/assets/avaliacao-jule.png')
+  },
+  {
+    name: 'Graciete Sousa',
+    rating: 4,
+    text: 'Atendimento maravilhoso! Fui bem atendida desde a recepção.',
+    image: withBase('/assets/avaliacao-graciete.png')
+  }
+] as const;
+---
+<BaseLayout title="Clínica Ceilândia" description="Clínica Ceilândia — consultas e exames com preço popular. Cardiologia, Clínica Médica, Ginecologia, Ortopedia, Pediatria e muito mais.">
+  <section class="home-hero">
+    <div class="hero-shape shape-a"></div>
+    <div class="hero-shape shape-b"></div>
+    <div class="container hero-card">
+      <div class="hero-media" aria-hidden="true">
+        <video
+          class="hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        >
+          <source src={withBase('/assets/video-hero.mp4')} type="video/mp4" />
+        </video>
+      </div>
+      <div class="hero-content">
+        <div class="eyebrow">Saúde acessível na Ceilândia</div>
+        <h1>Clínica Ceilândia — Consultas e Exames com Preço Popular</h1>
+        <p>Cardiologia, Clínica Médica, Ginecologia, Ortopedia, Pediatria e muito mais. Atendimento humanizado, médicos experientes e valores acessíveis para quem não tem plano de saúde.</p>
+        <div class="button-row">
+          <WhatsAppButton />
+          <a class="button button-light" href={withBase('/especialidades/')}>Ver Especialidades</a>
+        </div>
+        <div class="hero-badge"><Icon name="check" /> Consultas a partir de R$ 90,00* | Atendimento com hora marcada</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust-strip">
+    <div class="container trust-grid">
+      <div><strong>R$ 90</strong><span>consultas a partir de</span></div>
+      <div><strong>8</strong><span>especialidades médicas</span></div>
+      <div><strong>4</strong><span>modalidades de exames</span></div>
+      <div><strong>DF</strong><span>médicos experientes</span></div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="container">
+      <div class="section-heading centered">
+        <span class="section-kicker">Cuidado que cabe na sua rotina</span>
+        <h2>Por que escolher a Clínica Ceilândia</h2>
+      </div>
+      <div class="difference-grid">
+        {differences.map(([title, text, icon]) => (
+          <article class="info-card">
+            <div class="icon-badge"><Icon name={icon} /></div>
+            <h3>{title}</h3><p>{text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section section-tinted">
+    <div class="container split-intro">
+      <div class="section-heading">
+        <span class="section-kicker">Atendimento completo</span>
+        <h2>Especialidades Médicas</h2>
+        <p>Contamos com profissionais dedicados às principais áreas da medicina clínica e preventiva.</p>
+      </div>
+      <a class="text-link" href={withBase('/especialidades/')}>Ver todas as especialidades <Icon name="arrow" /></a>
+    </div>
+    <div class="container specialty-grid">
+      {specialties.map(([name, href, icon], index) => (
+        <a class="specialty-card" href={withBase(href)}>
+          <span class="card-number">{String(index + 1).padStart(2, '0')}</span>
+          <div class="icon-badge"><Icon name={icon} size={28} /></div>
+          <h3>{name}</h3>
+          <span>Saiba mais <Icon name="arrow" size={18} /></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="container feature-split">
+      <div class="image-panel">
+        <img src={withBase('/assets/equipe-clinica.png')} alt="Imagem ilustrativa de uma equipe de profissionais de saúde" loading="lazy" />
+        <span class="image-disclaimer">Imagem ilustrativa</span>
+        <div class="image-stat"><strong>Atendimento humanizado</strong><span>do acolhimento ao diagnóstico</span></div>
+      </div>
+      <div>
+        <span class="section-kicker">Quem Somos</span>
+        <h2>Saúde de qualidade, com preço justo</h2>
+        <p>A Clínica Ceilândia atua há anos oferecendo atendimento médico de qualidade com preços populares para a população da Ceilândia e região. Nossa equipe reúne clínicos, pediatras, ginecologistas, cardiologistas, ortopedistas e cirurgiões, além de estrutura própria para exames laboratoriais, de imagem e cardiológicos.</p>
+        <ul class="check-list">
+          <li><Icon name="check" /> Médicos reconhecidos dos melhores hospitais do DF</li>
+          <li><Icon name="check" /> Consultórios e equipamentos próprios</li>
+          <li><Icon name="check" /> Clínica Legalizada — CFM</li>
+        </ul>
+        <a class="button button-secondary" href={withBase('/quem-somos/')}>Conheça nossa história</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="exams-band">
+    <div class="container">
+      <div class="section-heading light centered">
+        <span class="section-kicker">Diagnóstico com agilidade</span>
+        <h2>Exames e Diagnóstico</h2>
+        <p>Realizamos exames com resultado rápido e equipe qualificada para atendimento presencial.</p>
+      </div>
+      <div class="exam-grid">
+        {exams.map(([name, href], index) => (
+          <a href={withBase(href)} class="exam-card"><span>0{index + 1}</span><h3>{name}</h3><Icon name="arrow" /></a>
+        ))}
+      </div>
+      <div class="centered actions-top"><a class="button button-light" href={withBase('/exames/')}>Ver todos os exames</a></div>
+    </div>
+  </section>
+
+  <section class="content-section reviews-section">
+    <div class="container">
+      <div class="reviews-heading">
+        <div class="section-heading">
+          <span class="section-kicker">Experiências de pacientes</span>
+          <h2>Quem já foi atendido recomenda</h2>
+          <p>Avaliações públicas compartilhadas por pacientes no Google Maps.</p>
+        </div>
+        <div class="reviews-summary" aria-label="Média das avaliações apresentadas: 4,7 de 5 estrelas">
+          <strong>4,7</strong>
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          <small>média das avaliações apresentadas</small>
+        </div>
+      </div>
+      <div class="reviews-grid">
+        {reviews.map((review) => (
+          <figure class="review-card">
+            <div class="review-stars" aria-label={`${review.rating} de 5 estrelas`}>
+              <span aria-hidden="true">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+            </div>
+            <blockquote>“{review.text}”</blockquote>
+            <figcaption>
+              <img src={review.image} alt="" width="56" height="56" loading="lazy" />
+              <div>
+                <strong>{review.name}</strong>
+                <span>Avaliação no Google Maps</span>
+              </div>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section section-tinted">
+    <div class="container location-grid">
+      <div>
+        <span class="section-kicker">Onde Estamos</span>
+        <h2>Fácil de chegar.<br />Fácil de cuidar.</h2>
+        <p>Estamos localizados na Ceilândia/DF, em frente à Fundação Bradesco e próximo ao Hospital São Francisco.</p>
+        <div class="contact-line"><Icon name="pin" /><span>QNN 18, Conjunto H, Lote 5, Loja 1, Sala 3 — Ceilândia/DF</span></div>
+        <div class="contact-line"><Icon name="clock" /><span>Segunda a sexta, 8h às 17h30 | Sábado, 8h às 12h</span></div>
+        <a class="button button-outline" href="https://www.google.com/maps?cid=183631488420269462" target="_blank" rel="noopener">Ver rota no mapa</a>
+      </div>
+      <MapEmbed />
+    </div>
+  </section>
+
+  <section class="appointment-section">
+    <div class="container appointment-grid">
+      <div>
+        <span class="section-kicker">Agendamento simples</span>
+        <h2>Agende sua Consulta ou Exame</h2>
+        <p>Atendimento rápido, sem filas de espera. Fale agora pelo WhatsApp ou preencha o formulário de pré-agendamento.</p>
+        <div class="security-row">
+          <span><Icon name="shield" /> Clínica Legalizada (CFM)</span>
+          <span><Icon name="check" /> Site Seguro</span>
+        </div>
+      </div>
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>

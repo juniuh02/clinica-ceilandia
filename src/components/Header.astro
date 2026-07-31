@@ -1,0 +1,81 @@
+---
+import { exams, specialties } from '../data/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { withBase } from '../lib/urls';
+const current = Astro.url.pathname;
+const active = (href: string) => {
+  const target = withBase(href);
+  return href === '/' ? current === target : current.startsWith(target);
+};
+---
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<header class="site-header">
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>Consultas a partir de R$ 90,00*</span>
+      <span>Seg–Sex 8h–17h30 · Sáb 8h–12h</span>
+    </div>
+  </div>
+  <div class="container nav-wrap">
+    <a class="brand" href={withBase('/')} aria-label="Clínica Ceilândia — início">
+      <img src={withBase('/assets/logo.svg')} width="204" height="72" alt="Clínica Ceilândia" />
+    </a>
+    <button class="menu-toggle" aria-controls="main-nav" aria-expanded="false">
+      <span></span><span></span><span></span><span class="sr-only">Abrir menu</span>
+    </button>
+    <nav id="main-nav" class="main-nav" aria-label="Navegação principal">
+      <a class:list={{ active: active('/') }} href={withBase('/')}>Home</a>
+      <a class:list={{ active: active('/quem-somos/') }} href={withBase('/quem-somos/')}>Quem Somos</a>
+      <details class="nav-dropdown">
+        <summary class:list={{ active: active('/especialidades/') }}>Especialidades</summary>
+        <div class="dropdown-panel">
+          <a href={withBase('/especialidades/')}><strong>Todas as especialidades</strong></a>
+          {specialties.map(([name, href]) => <a href={withBase(href)}>{name}</a>)}
+        </div>
+      </details>
+      <details class="nav-dropdown">
+        <summary class:list={{ active: active('/exames/') }}>Exames</summary>
+        <div class="dropdown-panel">
+          <a href={withBase('/exames/')}><strong>Todos os exames</strong></a>
+          {exams.map(([name, href]) => <a href={withBase(href)}>{name}</a>)}
+        </div>
+      </details>
+      <a class:list={{ active: active('/convenios/') }} href={withBase('/convenios/')}>Convênios</a>
+      <a class:list={{ active: active('/contato/') }} href={withBase('/contato/')}>Contato</a>
+    </nav>
+    <WhatsAppButton class="header-cta" />
+  </div>
+</header>
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.querySelector<HTMLElement>('#main-nav');
+  const dropdowns = Array.from(document.querySelectorAll<HTMLDetailsElement>('.nav-dropdown'));
+  button?.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('open', !open);
+  });
+
+  dropdowns.forEach((dropdown) => {
+    dropdown.addEventListener('toggle', () => {
+      if (!dropdown.open) return;
+      dropdowns.forEach((other) => {
+        if (other !== dropdown) other.open = false;
+      });
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) return;
+    if (!dropdowns.some((dropdown) => dropdown.contains(target))) {
+      dropdowns.forEach((dropdown) => dropdown.open = false);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    dropdowns.forEach((dropdown) => dropdown.open = false);
+    button?.focus();
+  });
+</script>

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/urls';
+---
+<BaseLayout title="Página não encontrada" description="A página solicitada não foi encontrada.">
+  <section class="page-hero">
+    <div class="container narrow centered">
+      <span class="section-kicker">Erro 404</span>
+      <h1>Página não encontrada</h1>
+      <p>O endereço acessado não existe ou foi alterado.</p>
+      <a class="button button-primary" href={withBase('/')}>Voltar para a página inicial</a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,15 @@
+---
+interface Props { class?: string }
+const { class: className = '' } = Astro.props;
+const mapUrl =
+  'https://www.google.com/maps?q=QNN%2018%20Conjunto%20H%20Lote%205%20Ceil%C3%A2ndia%20Bras%C3%ADlia%20DF%2072225-188&z=16&output=embed';
+---
+<div class:list={['map-embed', className]}>
+  <iframe
+    src={mapUrl}
+    title="Mapa com a localização da Clínica Ceilândia"
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    allowfullscreen
+  ></iframe>
+</div>

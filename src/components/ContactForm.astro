@@ -1,0 +1,53 @@
+---
+import { specialties } from '../data/site';
+import { withBase } from '../lib/urls';
+---
+<form class="contact-form" action="https://api.whatsapp.com/send" method="get" target="_blank" data-prebooking-form>
+  <input type="hidden" name="phone" value="5561991117464" />
+  <div class="field span-2">
+    <label for="nome">Nome <span aria-hidden="true">*</span></label>
+    <input id="nome" name="nome" autocomplete="name" required />
+  </div>
+  <div class="field span-2">
+    <label for="telefone">WhatsApp <span aria-hidden="true">*</span></label>
+    <input id="telefone" name="telefone" type="tel" autocomplete="tel" required />
+  </div>
+  <div class="field">
+    <label for="especialidade">Serviço desejado <span aria-hidden="true">*</span></label>
+    <select id="especialidade" name="especialidade" required>
+      <option value="" selected disabled>Selecione uma opção</option>
+      {specialties.map(([name]) => <option>{name}</option>)}
+      <option>Ecografia</option>
+      <option>Raio-X</option>
+      <option>Exame Admissional/Demissional</option>
+      <option>Não sei ainda</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="data">Data de preferência</label>
+    <input id="data" name="data" type="date" />
+  </div>
+  <button class="button button-primary span-2" type="submit">Enviar Pré-Agendamento</button>
+  <p class="form-privacy span-2">
+    Ao enviar, você será direcionado ao WhatsApp. Seus dados serão utilizados somente para responder ao pedido de pré-agendamento.
+    <a href={withBase('/politica-de-privacidade/')}>Política de Privacidade</a>.
+  </p>
+</form>
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-prebooking-form]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = new FormData(form);
+      const message = [
+        'Olá! Estou no site da Clínica Ceilândia e gostaria de fazer um pré-agendamento.',
+        `Nome: ${data.get('nome')}`,
+        `WhatsApp: ${data.get('telefone')}`,
+        `Serviço: ${data.get('especialidade')}`,
+        `Data de preferência: ${data.get('data') || 'A combinar'}`
+      ].join('\n');
+      const url = `https://api.whatsapp.com/send?phone=5561991117464&text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+  });
+</script>

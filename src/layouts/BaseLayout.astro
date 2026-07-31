@@ -1,0 +1,33 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ScrollAnimations from '../components/ScrollAnimations.astro';
+import { withBase } from '../lib/urls';
+import '../styles/global.css';
+interface Props { title: string; description?: string }
+const {
+  title,
+  description = 'Consultas e exames com preço popular na Ceilândia. Atendimento humanizado e médicos experientes.'
+} = Astro.props;
+const pageTitle = title === 'Clínica Ceilândia' ? title : `${title} | Clínica Ceilândia`;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#1B3A6B" />
+    <link rel="icon" type="image/png" href={withBase('/assets/favicon.png')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <Header />
+    <main id="conteudo"><slot /></main>
+    <Footer />
+    <ScrollAnimations />
+  </body>
+</html>

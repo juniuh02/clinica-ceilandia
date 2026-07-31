@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CopyPage from '../components/CopyPage.astro';
+import { routes } from '../data/site';
+import { getCopyPage } from '../lib/copy';
+
+export function getStaticPaths() {
+  return routes.map((route) => ({
+    params: { slug: route.path.replace(/^\/|\/$/g, '') },
+    props: route
+  }));
+}
+
+const route = Astro.props;
+const sections = getCopyPage(route.code);
+---
+<BaseLayout title={route.title}>
+  <CopyPage sections={sections} pageTitle={route.title} path={route.path} />
+</BaseLayout>
